@@ -1,0 +1,91 @@
+// Decompiled by Jad v1.5.8g. Copyright 2001 Pavel Kouznetsov.
+// Jad home page: http://www.kpdus.com/jad.html
+// Decompiler options: packimports(3) 
+// Source File Name:   TryWithResourceTest.java
+
+package exception;
+
+import java.io.PrintStream;
+import java.sql.*;
+
+public class TryWithResourceTest
+{
+
+    public TryWithResourceTest()
+    {
+    }
+
+    public void jdbc()
+    {
+        String s = "SELECT * FROM dual";
+        try
+        {
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/test?serverTimezone=GMT");
+            try
+            {
+                Statement statement = connection.createStatement();
+                try
+                {
+                    ResultSet resultset = statement.executeQuery(s);
+                    try
+                    {
+                        while(resultset.next()) 
+                        {
+                            String s1 = resultset.getString("name");
+                            System.out.println(s1);
+                        }
+                    }
+                    catch(Throwable throwable3)
+                    {
+                        if(resultset != null)
+                            try
+                            {
+                                resultset.close();
+                            }
+                            catch(Throwable throwable5)
+                            {
+                                throwable3.addSuppressed(throwable5);
+                            }
+                        throw throwable3;
+                    }
+                    if(resultset != null)
+                        resultset.close();
+                }
+                catch(Throwable throwable1)
+                {
+                    if(statement != null)
+                        try
+                        {
+                            statement.close();
+                        }
+                        catch(Throwable throwable4)
+                        {
+                            throwable1.addSuppressed(throwable4);
+                        }
+                    throw throwable1;
+                }
+                if(statement != null)
+                    statement.close();
+            }
+            catch(Throwable throwable)
+            {
+                if(connection != null)
+                    try
+                    {
+                        connection.close();
+                    }
+                    catch(Throwable throwable2)
+                    {
+                        throwable.addSuppressed(throwable2);
+                    }
+                throw throwable;
+            }
+            if(connection != null)
+                connection.close();
+        }
+        catch(SQLException sqlexception)
+        {
+            sqlexception.printStackTrace();
+        }
+    }
+}
